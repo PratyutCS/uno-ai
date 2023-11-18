@@ -65,7 +65,7 @@ void displayGameState(vector<card> ai , vector<card> human){
 
 int main()
 {
-	vector<card> deck;
+    vector<card> deck;
 
     string color[4] = {"Red","Blue","Green","Yellow"};
     string special_card[3] = {"skip","reverse","+2"};
@@ -78,12 +78,12 @@ int main()
 	        deck.push_back(card{color[i],0,special_card[j]});
         }
     }
-    // for(int i=0;i<4;i++){
-	//         deck.push_back(card{"",0,"wild_card"});
-    // }
-    // for(int i=0;i<4;i++){
-	//         deck.push_back(card{"",0,"+4"});
-    // }
+    for(int i=0;i<4;i++){
+	        deck.push_back(card{"",0,"wild_card"});
+    }
+    for(int i=0;i<4;i++){
+	        deck.push_back(card{"",0,"+4"});
+    }
 
 
     cout << "DECK.SIZE() : " << deck.size() << endl;
@@ -119,6 +119,7 @@ int main()
     vector<card> playedCards;
     bool skip = false;
     int draw = 0;
+    string changeColor = "";
     
     while(true){
         if(human.size() == 0){
@@ -169,56 +170,104 @@ int main()
             card selectedCard;
             int selectedCardNumber = 0;
             
-            for(int i=0;i<ai.size();i++){
-                if((ai[i].color.compare(color) == 0) && (color != "")){
-                        cout << "color found" <<endl;
-                    selectedCard = ai[i];
-                    selectedCardNumber = i+1;
-                    break;
+            
+            if(topCard.number == -1){
+                for(int i=0;i<ai.size();i++){
+                        if((ai[i].color.compare(color) == 0) && (color != "")){
+                                cout << "color found" <<endl;
+                            selectedCard = ai[i];
+                            selectedCardNumber = i+1;
+                            break;
+                        }
+                        else if ((ai[i].action.compare(action) == 0) && (action != "")){
+                                cout << "action found\n" <<endl;
+                            selectedCard = ai[i];
+                            selectedCardNumber = i+1;
+                            break;
+                        }
                 }
-                else if (ai[i].number == number && number != 0){
-                        cout << "number found" <<endl;
-                    selectedCard = ai[i];
-                    selectedCardNumber = i+1;
-                    break;
-                }
-                else if ((ai[i].action.compare(action) == 0) && (action != "")){
-                        cout << "action found\n" <<endl;
-                    selectedCard = ai[i];
-                    selectedCardNumber = i+1;
-                    break;
-                }
+            }
+            else{
+                    for(int i=0;i<ai.size();i++){
+                        if((ai[i].color.compare(color) == 0) && (color != "")){
+                                cout << "color found" <<endl;
+                            selectedCard = ai[i];
+                            selectedCardNumber = i+1;
+                            break;
+                        }
+                        else if (ai[i].number == number && number != 0){
+                                cout << "number found" <<endl;
+                            selectedCard = ai[i];
+                            selectedCardNumber = i+1;
+                            break;
+                        }
+                        else if ((ai[i].action.compare(action) == 0) && (action != "")){
+                                cout << "action found\n" <<endl;
+                            selectedCard = ai[i];
+                            selectedCardNumber = i+1;
+                            break;
+                        }
+                    }
             }
             
             if(selectedCardNumber == 0){
-                cout << "A.I. drawing card" << endl;
-                ai.push_back(sdeck.front());
-                sdeck.pop();
-                isAi = false;
-                continue;
+                for(int i=0;i<ai.size();i++){
+                        if(ai[i].action.compare("")!=0 &&ai[i].color.compare("") == 0 && ai[i].number == 0){
+                                selectedCard = ai[i];
+                                selectedCardNumber = i+1;
+                                break;
+                        }
+                }
+                if(selectedCardNumber == 0){
+                        cout << "A.I. drawing card" << endl;
+                        ai.push_back(sdeck.front());
+                        sdeck.pop();
+                        isAi = false;
+                        continue;
+                }
             }
             
-            if(selectedCard.action.compare("") != 0){
-                        if(selectedCard.action.compare("skip") == 0){
-		                skip = true;
-		                draw = 0;
-		        }
-		        else if(selectedCard.action.compare("reverse") == 0){
-		                skip = true;
-		                draw = 0;
-		        }
-		        else{
-		                skip = true;
-		                draw = 2;
-		        }
-            }
             
             cout << "Card Seleted : ";
             pr(selectedCard);
             cout << "Card Number is : " << selectedCardNumber <<endl;
             playedCards.push_back(topCard);
-            topCard = selectedCard;
             ai.erase(ai.begin()+(selectedCardNumber-1));
+            
+            if(selectedCard.color.compare("") == 0 && selectedCard.number == 0 && selectedCard.action.compare("") != 0){
+		        if(selectedCard.action.compare("+4") == 0){
+		                changeColor = ai[0].color;
+		                skip = true;
+		                draw = 4;
+		                selectedCard.color = changeColor;
+		                selectedCard.number = -1;
+		        }
+		        else{
+		                changeColor = ai[0].color;
+		                skip = false;
+		                draw =0;
+		                selectedCard.color = changeColor;
+		                selectedCard.number = -1;
+		        }
+		     }
+            else if(selectedCard.action.compare("") != 0){
+                        if(selectedCard.action.compare("skip") == 0){
+		                skip = true;
+		                draw = 0;
+		                changeColor = "";
+		        }
+		        else if(selectedCard.action.compare("reverse") == 0){
+		                skip = true;
+		                draw = 0;
+		                changeColor = "";
+		        }
+		        else{
+		                changeColor = "";
+		                skip = true;
+		                draw = 2;
+		        }
+            }
+            topCard = selectedCard;
             isAi = false;
         }
 
@@ -256,29 +305,59 @@ int main()
             	int number = topCard.number;
             	string action = topCard.action;
             	bool valid = false;
-            	if((human[input-1].color.compare(color) == 0 || human[input-1].number == number) && (human[input-1].color.compare(color) == 0 || human[input-1].action == action)){
+            	if
+            	(
+                    	(
+                            	(human[input-1].color.compare(color) == 0 || human[input-1].number == number)
+                            	 && 
+                            	(human[input-1].color.compare(color) == 0 || human[input-1].action.compare(action) == 0)
+                    	)
+                    	 || 
+            	        (human[input-1].color.compare("") == 0 && human[input-1].number == 0 && human[input-1].action.compare("") != 0)
+            	)
+            	{
             	        valid = true;
             	}
             	if(valid){
             	     
-		     cout << "Card Seleted" << endl ;
+		     cout << "Card Seleted" << endl;
 		     pr(human[input-1]);
 		     playedCards.push_back(topCard);
 		     topCard = human[input-1];
 		     
+		     if(human[input-1].color.compare("") == 0 && human[input-1].number == 0 && human[input-1].action.compare("") != 0){
+		        if(human[input-1].action.compare("+4") == 0){
+		                cout << "enter the color : \nRed\nBlue\nGreen\nYellow" <<endl;
+		                cin >> changeColor;
+		                skip = true;
+		                draw = 4;
+		                topCard.color = changeColor;
+		                topCard.number = -1;
+		        }
+		        else{
+		                cout << "enter the color : \nRed\nBlue\nGreen\nYellow" <<endl;
+		                cin >> changeColor;
+		                skip = false;
+		                draw =0;
+		                topCard.color = changeColor;
+		                topCard.number = -1;
+		        }
+		     }
 		     
-		     
-		     if(human[input-1].action.compare("") != 0){
+		     else if(human[input-1].action.compare("") != 0){
 		        cout << "executing ifelseif for action card" << endl;
 		        if(human[input-1].action.compare("skip") == 0){
+		                changeColor = "";
 		                skip = true;
 		                draw = 0;
 		        }
 		        else if(human[input-1].action.compare("reverse") == 0){
+		                changeColor = "";
 		                skip = true;
 		                draw = 0;
 		        }
 		        else{
+		                changeColor = "";
 		                skip = true;
 		                draw = 2;
 		        }
