@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <vector>
 #include <string.h>
+#include <random>
+#include <chrono> 
 
 using namespace std;
 
@@ -84,10 +86,10 @@ int main()
     // }
 
 
-	cout << "DECK.SIZE() : " << deck.size() << endl;
-
-    srand(time(0));
-    random_shuffle(deck.begin(), deck.end());
+    cout << "DECK.SIZE() : " << deck.size() << endl;
+    
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    shuffle (deck.begin(), deck.end(), default_random_engine(seed));
 
     queue<card> sdeck;
     for(int i=0;i<deck.size();i++){
@@ -132,12 +134,13 @@ int main()
         displayGameState(ai,human);
         cout << "\ntopCard --" << endl;
         pr(topCard);
+        
         if(sdeck.size() == 0){
-            random_shuffle(playedCards.begin(), playedCards.end());
-            for(int i=0;i<playedCards.size();i++){
-                sdeck.push(playedCards[i]);
+            shuffle (playedCards.begin(), playedCards.end(), default_random_engine(seed));
+            for(;playedCards.size()!=0;){
+                sdeck.push(playedCards.front());
+                playedCards.erase(playedCards.begin());
             }
-            playedCards.clear();
         }
 
         //A.I.
